@@ -7,7 +7,7 @@ import { connectDB } from "./db.config.js"
 import cookieParser from "cookie-parser"
 import morgan from "morgan"
 import swaggerUi from "swagger-ui-express"
-import swaggerSpec  from "./config/config.js"
+import {swaggerSpec}  from "./config/config.js"
 dotenv.config()
 
 //express application
