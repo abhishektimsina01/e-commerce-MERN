@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { hashPassword, verifyPassword } from "../utils/hash.js";
 
 const userSchema = new mongoose.Schema({
     name : {type : String, required : true},
@@ -10,6 +11,22 @@ const userSchema = new mongoose.Schema({
     resetPasswordTokenExpiresIn : Date,
     refreshToken : String,
 }, {timestamps : true, versionKey : false})
+
+userSchema.methods.isPasswordRight = (password) =>{
+    const isSame = verifyPassword(password, this.password)
+    return isSame
+}
+
+userSchema.pre("save", async function (next){
+    //tjis contains the documetn to be saved
+    if(!this.isModified("password")){
+        next()
+    }
+    else{
+        this.password = await hashPassword(this.password)
+        console.log("hashed password is", this.password)
+    }
+})
 
 const Users = mongoose.model("users", userSchema)
 
