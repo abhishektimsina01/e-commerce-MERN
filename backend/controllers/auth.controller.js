@@ -3,6 +3,7 @@ import { generateAccessAndRefreshToken } from "../utils/jwt.js";
 import {userLogInSchema, userSignUpSchema} from "../validation/validation.js"
 import jwt from "jsonwebtoken"
 import bcrypt from "bcryptjs";
+import {signupMail} from "../mails/SignupMail.js"
 const signup = async(req,res,next) =>{
     const allowedRoles = ["consumer", "provider"]
     try{
@@ -34,6 +35,7 @@ const signup = async(req,res,next) =>{
             maxAge : 2*24*60*60 *1000
         }
         res.cookie("accessToken", accessToken, option).cookie("refreshToken", refreshToken, option)
+        signupMail()
         res.status(200).json({
             message : "registered"
         })

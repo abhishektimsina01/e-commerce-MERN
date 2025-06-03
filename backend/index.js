@@ -5,7 +5,6 @@ import { authRouter} from "./routes/auth.route.js"
 import { adminRouter } from "./routes/admin.route.js"
 import { connectDB } from "./db.config.js"
 import {serverMiddleware} from "./middleware/server.middleware.js"
-import { Users } from "./models/user.js"
 dotenv.config()
 
 //express application
@@ -21,6 +20,7 @@ app.use("/admin", adminRouter)
 // app.use("/user", userRouter)
 // app.use("/cart", cartRouter)
 // app.use("/order", orderRouter)
+// app.use("/orderHistory", orderHistoryRouter)
 // app.use("/product", productRouter)
 // app.use("/payment", paymentRouter)
 // app.use("/review", reviewRouter)

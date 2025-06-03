@@ -1,4 +1,3 @@
-import { ref } from "joi";
 import mongoose, { mongo } from "mongoose";
 
 const historySchema = mongoose.Schema({

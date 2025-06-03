@@ -5,6 +5,41 @@ const getAllUser = async(req,res,next) => {
     res.json(users)
 }
 
+const getOneUser = async(req,res,next) => {
+    const userId = req.params.id
+    const resut = await Users.aggregate([
+        {$match : {_id : userId}},
+        {$lookup : {
+            from : "orders",
+            localFeild : "_id",
+            foreignField : "user",
+            as : "orders"
+        }},
+        {$lookup : {
+            from : "reviews",
+            localFeild : "_id",
+            foreignField : "user",
+            as : "reviews"
+        }},
+        {$project : {
+            _id : 1,
+            name : 1,
+            email : 1,
+            address : 1,
+            orders : {
+                $map : {
+                    input : "orders",
+                    as : "order",
+                    in : {
+                        _id : "$$order._id",
+                        product : "$$order.product"
+                    }
+                }
+            }
+        }},
+    ])
+}
+
 const delAllUser = async(req,res,next) => {
     try{
         await Users.deleteMany({$or : [{role : "consumer"}, {role :"provider"}]})
@@ -17,13 +52,11 @@ const delAllUser = async(req,res,next) => {
     }
 }
 
-const delOneUser = (req,res,next) => {
+const delOneUser = async(req,res,next) => {
     try{
         const userId = req.params.id
-        res.json({
-            userId
-        })
-        //remove the user
+        await Users.deleteOne({_id : userId})
+        res.json({message : "deleted user"})
     }
     catch(err){
         next(err)
