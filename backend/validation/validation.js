@@ -9,6 +9,7 @@ const userSignUpSchema = Joi.object({
     name : Joi.string().min(3).max(30).trim().required(),
     email : Joi.string().email().trim().required(),
     password : Joi.string().required(),
+    role : Joi.string().valid("consumer", "provider"),
     address : Joi.string().required()
 })
 

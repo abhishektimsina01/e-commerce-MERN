@@ -6,8 +6,6 @@ const authRouter = express.Router()
 authRouter.post("/signup",signup)
 authRouter.get("/refresh",refresh)
 authRouter.post("/login",login)
-authRouter.post("/resetPasswordToken", resetPasswordToken)
-authRouter.get("/resetPassword", resetPassword)
 authRouter.get("/logout", logout)
 
 export {authRouter}

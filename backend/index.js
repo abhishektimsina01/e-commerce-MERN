@@ -24,7 +24,6 @@ app.use("/admin", adminRouter)
 // app.use("/product", productRouter)
 // app.use("/payment", paymentRouter)
 // app.use("/review", reviewRouter)
-// app.use("/orderHistory", historyRouter)
 
 
 //undefined route/method and error handler

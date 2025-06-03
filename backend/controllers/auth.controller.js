@@ -2,7 +2,7 @@ import { Users } from "../models/user.js"
 import { generateAccessAndRefreshToken } from "../utils/jwt.js";
 import {userLogInSchema, userSignUpSchema} from "../validation/validation.js"
 import jwt from "jsonwebtoken"
-
+import bcrypt from "bcryptjs";
 const signup = async(req,res,next) =>{
     const allowedRoles = ["consumer", "provider"]
     try{
@@ -50,14 +50,15 @@ const login = async(req,res,next) =>{
                 throw error
             }
             const {email , password} = req.body
-            const user = await Users.findOne({email}).select("-password -createdAt -updatedAt")
+            const user = await Users.findOne({email})
+            console.log(user)
             if(!user){
                 const err = new Error("no user found")
                 err.status = 404
                 throw err
             }
-            const isPasswordRight = user.isPasswordRight(password)
-            if(!isPasswordRight){
+            const isPasswordCorrect = await bcrypt.compare(password, user.password)
+            if(!isPasswordCorrect){
                 const err = new Error("email or password is not right")
                 err.status = 400
                 throw err
@@ -110,7 +111,11 @@ const refresh = async(req,res,next) => {
 
 const resetPassword = async(req,res,next) =>{
     try{
-
+        const {NewPassword, ConfirmPassword} = req.body
+        if(NewPassword != ConfirmPassword){
+            const err = new Error("Should be a same password")
+            throw err
+        }
     }
     catch(err){
 
@@ -119,19 +124,27 @@ const resetPassword = async(req,res,next) =>{
 
 const resetPasswordToken = async(req,res,next) =>{
     try{
+        const {email} = req.body
+        const isEmailExist = await Users.findOne({email})
+        if(!isEmailExist){
+            const err = new Error("User doesnt exist with that email")
+            throw err
+        }
 
     }
     catch(err){
-
+        next(err)
     }
 }
 
-const logout = async(req,res,next) =>{
+const logout = (req,res,next) =>{
     try{
-
+        res.clearCookie("accessToken")
+        res.clearCookie("refreshToken")
+        res.json({message : "loggout Out"})
     }
     catch(err){
-        
+        next(err)
     }
 }
 
