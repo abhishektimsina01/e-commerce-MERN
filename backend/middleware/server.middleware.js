@@ -15,10 +15,10 @@ const serverMiddleware = (app) => {
     const allowedOrigins = ["http://localhost:3000", "http://domain.com"]
     app.use(limiter)
     app.use(cors())
-    app.use(morgan("dev"))
+    // app.use(morgan("dev"))
     app.use(express.json())
     app.use(express.urlencoded({extended : true}))
-    app.use(cookieParser)
+    app.use(cookieParser())
     console.log("middleware started")
 }
 

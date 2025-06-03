@@ -1,41 +1,107 @@
 import { Users } from "../models/user.js"
+import { generateAccessAndRefreshToken } from "../utils/jwt.js";
 import {userLogInSchema, userSignUpSchema} from "../validation/validation.js"
-const login = async(req,res,next) =>{
+import jwt from "jsonwebtoken"
+
+const signup = async(req,res,next) =>{
+    const allowedRoles = ["consumer", "provider"]
     try{
-        const isUser = async(req,res,next) =>{
-            const {error} = userLogInSchema.validate(req.body)
-            if(error){
-                throw err
-            }
-            const {email , password} = req.body
-            const user = await Users.findOne({email})
-            if(!user){
-                const err = new Error("no user found")
-                throw err
-            }
-            const isPasswordRight = user.checkPassword(password)
-            if(!isPasswordRight){
-                const err = new Error("email or password is not right")
-                throw err
-            }
-            res.status.json({
-                message : "Logged In"
-            })
+        let {error} = userSignUpSchema.validate(req.body)
+        if(error){
+            error.status = 400
+            throw error
         }
+        const {name, password, email, address} = req.body
+        const isEmailExist = await Users.findOne({email})
+        if(isEmailExist){
+            const err = new Error("Email already exist")
+            err.status = 406
+            throw err
+        }
+        const role = (allowedRoles.includes(req.body.role)) ? req.body.role : "consumer"
+        let user = await Users.create({
+            name,
+            email,
+            password,
+            role,
+            address
+        })
+        const {accessToken, refreshToken} = generateAccessAndRefreshToken(user._id)
+        const option = {
+            httpOnly : true,
+            secure : true,
+            sameSite : "strict", 
+            maxAge : 2*24*60*60 *1000
+        }
+        res.cookie("accessToken", accessToken, option).cookie("refreshToken", refreshToken, option)
+        res.status(200).json({
+            message : "registered"
+        })
     }
     catch(err){
         next(err)
     }
 }
 
-const signup = async(req,res,next) =>{
+const login = async(req,res,next) =>{
     try{
-        const {error} = userSignUpSchema.validate(req.body)
-        if(error){
-            throw err
+            const {error} = userLogInSchema.validate(req.body)
+            if(error){
+                throw error
+            }
+            const {email , password} = req.body
+            const user = await Users.findOne({email}).select("-password -createdAt -updatedAt")
+            if(!user){
+                const err = new Error("no user found")
+                err.status = 404
+                throw err
+            }
+            const isPasswordRight = user.isPasswordRight(password)
+            if(!isPasswordRight){
+                const err = new Error("email or password is not right")
+                err.status = 400
+                throw err
+            }
+            const option = {
+            httpOnly : true,
+            secure : true,
+            sameSite : "strict", 
+            maxAge : 2*24*60*60 *1000
         }
-        const {name, password, email} = req.body
-        res.status(200).json({name ,password, email})
+            const {accessToken, refreshToken} = generateAccessAndRefreshToken(user)
+            res.cookie("accessToken", accessToken,option).cookie("refreshToken", refreshToken, option)
+            console.log(accessToken, "\n", refreshToken)
+            res.status(200).json({
+                message : "Logged In"
+            })
+    }
+    catch(err){
+        next(err)
+    }
+}
+
+const refresh = async(req,res,next) => {
+    try{
+        const refreshToken = req.cookies.refreshToken
+        if(!refreshToken){
+            const err = new Error("no cookie found")
+            throw(err)
+        }
+        const data = jwt.verify(refreshToken, process.env.refresh_token)
+        const user = await Users.findById(data._id).select("-password -createdAt -updatedAt")
+        const option = {
+            httpOnly : true,
+            secure : true,
+            sameSite : "strict", 
+            maxAge : 2*24*60*60 *1000
+        }
+        const {accessToken, newRefreshToken} = generateAccessAndRefreshToken(user)
+        user.refreshToken = newRefreshToken
+        await user.save()
+        res.cookie("accessToken", accessToken, option).cookie("refreshToken", refreshToken, option)
+        res.json({
+            refreshToken
+        })
     }
     catch(err){
         next(err)
@@ -69,4 +135,4 @@ const logout = async(req,res,next) =>{
     }
 }
 
-export {login,signup,resetPassword,resetPasswordToken, logout}
+export {login,signup,refresh,resetPassword,resetPasswordToken, logout}

@@ -8,7 +8,8 @@ const userLogInSchema = Joi.object({
 const userSignUpSchema = Joi.object({
     name : Joi.string().min(3).max(30).trim().required(),
     email : Joi.string().email().trim().required(),
-    password : Joi.string().required()
+    password : Joi.string().required(),
+    address : Joi.string().required()
 })
 
 

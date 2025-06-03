@@ -1,9 +1,10 @@
 import express from "express"
-import { login, logout, resetPassword, resetPasswordToken, signup } from "../controllers/auth.controller.js"
+import { login, logout, refresh, resetPassword, resetPasswordToken, signup } from "../controllers/auth.controller.js"
 
 const authRouter = express.Router()
 
 authRouter.post("/signup",signup)
+authRouter.get("/refresh",refresh)
 authRouter.post("/login",login)
 authRouter.post("/resetPasswordToken", resetPasswordToken)
 authRouter.get("/resetPassword", resetPassword)

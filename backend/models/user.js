@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
     name : {type : String, required : true},
     password : {type : String, required : true},
     email : {type : String, required : true, unique : true},
-    roles : {type : String, enum : { values : ["admin","provider", "consumer"], message : "not valid role"}},
+    role     : {type : String, enum : { values : ["admin","provider", "consumer"], message : "not valid role"}},
     address : String,
     resetPasswordToken : Number,
     resetPasswordTokenExpiresIn : Date,
@@ -21,10 +21,11 @@ userSchema.pre("save", async function (next){
     //tjis contains the documetn to be saved
     if(!this.isModified("password")){
         next()
-    }
+    }   
     else{
         this.password = await hashPassword(this.password)
         console.log("hashed password is", this.password)
+        console.log(this)
     }
 })
 
