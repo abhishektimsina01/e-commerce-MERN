@@ -6,4 +6,5 @@ cloudinary.config({
     api_secret : " "
 })
 
+// cloudinary.uploader.upload(localPathOfTheFile)
 export {cloudinary} 

@@ -19,6 +19,7 @@ const productSchema = new mongoose.Schema({
         }
     },
     productOwner : {type : mongoose.Schema.Types.ObjectId, ref : "user"},
+    image : {type : String}
 }, {timestamps : true , versionKey : false})
 
 const Products = mongoose.model("products", productSchema)

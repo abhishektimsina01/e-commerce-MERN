@@ -2,6 +2,8 @@ import {sendMail} from "../helpers/sendMail.js"
 
 const signupMail = () => {
     const mailOptions = {
+        from : "timsinaabhihek1@gmail.com",
+        to : "timsinaabhishek1@gmail.com",
         subject : "Welcome to ATO e-commerce",
         html : `<!DOCTYPE html>
 <html lang="en">
