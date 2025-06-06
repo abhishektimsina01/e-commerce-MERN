@@ -1,6 +1,6 @@
 import {sendMail} from "../helpers/sendMail.js"
 
-const signupMail = () => {
+const signupMail = (name) => {
     const mailOptions = {
         from : "timsinaabhihek1@gmail.com",
         to : "timsinaabhishek1@gmail.com",
@@ -64,10 +64,10 @@ const signupMail = () => {
   <body>
     <div class="email-wrapper">
       <div class="email-header">
-        <h1>Welcome to [Your App Name] 🎉</h1>
+        <h1>Welcome to <b>ATO e-commerce</b> 🎉</h1>
       </div>
       <div class="email-content">
-        <h2>Hello, [User’s Name]!</h2>
+        <h2>Hello, <b>${name}</b>!</h2>
         <p>
           We're so excited to have you here. Thank you for joining our vibrant
           community — you're officially part of something amazing!
@@ -77,11 +77,11 @@ const signupMail = () => {
           you’re with us!
         </p>
         <p style="margin-top: 30px; color: #6b7280;">
-          – The [Your App Name] Team
+          – The <b>The ATO</b> Team
         </p>
       </div>
       <div class="footer">
-        &copy; 2025 [Your Company]. All rights reserved.
+        &copy; 2025 The ATO. All rights reserved.
       </div>
     </div>
   </body>

@@ -4,6 +4,7 @@ import {userLogInSchema, userSignUpSchema} from "../validation/validation.js"
 import jwt from "jsonwebtoken"
 import bcrypt from "bcryptjs";
 import {signupMail} from "../mails/SignupMail.js"
+
 const signup = async(req,res,next) =>{
     const allowedRoles = ["consumer", "provider"]
     try{
@@ -20,22 +21,25 @@ const signup = async(req,res,next) =>{
             throw err
         }
         const role = (allowedRoles.includes(req.body.role)) ? req.body.role : "consumer"
-        let user = await Users.create({
+        const user = await Users.create({
             name,
             email,
             password,
             role,
             address
         })
-        const {accessToken, refreshToken} = generateAccessAndRefreshToken(user._id)
+        const {accessToken, refreshToken} = await generateAccessAndRefreshToken(user._id)
         const option = {
             httpOnly : true,
             secure : true,
-            sameSite : "strict", 
+            // sameSite : "strict", 
             maxAge : 2*24*60*60 *1000
         }
+        user.refreshToken = refreshToken
+        user.isActive = true
+        user.save()
         res.cookie("accessToken", accessToken, option).cookie("refreshToken", refreshToken, option)
-        signupMail()
+        // signupMail(user.name)
         res.status(200).json({
             message : "registered"
         })
@@ -70,8 +74,10 @@ const login = async(req,res,next) =>{
             secure : true,
             sameSite : "strict", 
             maxAge : 2*24*60*60 *1000
-        }
-            const {accessToken, refreshToken} = generateAccessAndRefreshToken(user)
+            }
+            user.isActive = true
+            user.save()
+            const {accessToken, refreshToken} = await generateAccessAndRefreshToken(user)
             res.cookie("accessToken", accessToken,option).cookie("refreshToken", refreshToken, option)
             console.log(accessToken, "\n", refreshToken)
             res.status(200).json({
@@ -98,10 +104,10 @@ const refresh = async(req,res,next) => {
             sameSite : "strict", 
             maxAge : 2*24*60*60 *1000
         }
-        const {accessToken, newRefreshToken} = generateAccessAndRefreshToken(user)
+        const {accessToken, newRefreshToken} = await generateAccessAndRefreshToken(user)
         user.refreshToken = newRefreshToken
         await user.save()
-        res.cookie("accessToken", accessToken, option).cookie("refreshToken", refreshToken, option)
+        res.cookie("accessToken", accessToken, option).cookie("refreshToken", newRefreshToken, option)
         res.json({
             refreshToken
         })
@@ -139,8 +145,11 @@ const resetPasswordToken = async(req,res,next) =>{
     }
 }
 
-const logout = (req,res,next) =>{
+const logout = async(req,res,next) =>{
     try{
+        const user = await Users.findById(req.user._id)
+        user.isActive = false
+        user.save()
         res.clearCookie("accessToken")
         res.clearCookie("refreshToken")
         res.json({message : "loggout Out"})

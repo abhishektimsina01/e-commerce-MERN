@@ -7,7 +7,6 @@ const authorizeUser = (...role) => {
             next(err)
         }
         else{
-            console.log("Authoriazed for", req.method, req.url)
             next()
         }
     }

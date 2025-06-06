@@ -6,6 +6,7 @@ const orderSchema = new mongoose.Schema({
     quantity : {type : Number, min : 1},
     price : {type : Number, required : true},
     total : {type : Number, required : true},
+    status : {type : String, enum : {values : ["pending", "completed"], message : "the order must be either penfing or completed"}}
 })
 
 const Orders = mongoose.model("orders", orderSchema)

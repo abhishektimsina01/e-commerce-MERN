@@ -7,5 +7,5 @@ const reviewSchema = new mongoose.Schema({
     star : {type : Number, required : true}
 })
 
-const reviews = mongoose.model("reviews", reviewSchema)
-export {reviews}
+const Reviews = mongoose.model("reviews", reviewSchema)
+export {Reviews}

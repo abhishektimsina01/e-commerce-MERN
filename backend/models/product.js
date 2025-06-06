@@ -18,9 +18,10 @@ const productSchema = new mongoose.Schema({
             message  : "is not a valid category"
         }
     },
-    productOwner : {type : mongoose.Schema.Types.ObjectId, ref : "user"},
-    image : {type : String}
+    productOwner : {type : mongoose.Schema.Types.ObjectId, ref : "users"},
+    productImage : {type : String, default : "http://localhost:8000/env.jpg"}
 }, {timestamps : true , versionKey : false})
 
 const Products = mongoose.model("products", productSchema)
+console.log("Products schema regitered")
 export {Products}

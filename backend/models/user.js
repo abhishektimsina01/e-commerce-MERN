@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
     email : {type : String, required : true, unique : true},
     role : {type : String, enum : { values : ["superadmin","admin","provider", "consumer"], message : "not valid role"}},
     address : String,
+    isActive : Boolean,
     refreshToken : String,
 }, {timestamps : true, versionKey : false})
 
@@ -22,8 +23,6 @@ userSchema.pre("save", async function (next){
     }   
     else{
         this.password = await bcrypt.hash(this.password, 10)
-        console.log("hashed password is", this.password)
-        console.log(this)
     }
 })
 

@@ -3,6 +3,8 @@ import dotenv from "dotenv"
 import { errorHandler, notFound } from "./middleware/error.handler.middleware.js"
 import { authRouter} from "./routes/auth.route.js"
 import { adminRouter } from "./routes/admin.route.js"
+import { productRouter } from "./routes/product.route.js"
+import {userRouter} from "./routes/user.route.js"
 import { connectDB } from "./db.config.js"
 import {serverMiddleware} from "./middleware/server.middleware.js"
 import { fileURLToPath } from "url"
@@ -23,11 +25,11 @@ serverMiddleware(app, __dirname)
 //routers
 app.use("/auth", authRouter)
 app.use("/admin", adminRouter)
-// app.use("/user", userRouter)
+app.use("/user", userRouter)
+app.use("/product", productRouter)
 // app.use("/cart", cartRouter)
 // app.use("/order", orderRouter)
 // app.use("/orderHistory", orderHistoryRouter)
-// app.use("/product", productRouter)
 // app.use("/payment", paymentRouter)
 // app.use("/review", reviewRouter)
 app.use("/download",downloadRouter)
