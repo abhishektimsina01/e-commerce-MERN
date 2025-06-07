@@ -59,7 +59,8 @@ const getAllreview = async(req,res,next) => {
             res.json(reviews)
         }
         else if(req.user.role == "admin" || req.user.role == "superadmin"){
-
+            const reviews = await Reviews.find()
+            
         }
     }
     catch(err){

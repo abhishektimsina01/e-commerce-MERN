@@ -5,7 +5,7 @@ import { authRouter} from "./routes/auth.route.js"
 import { adminRouter } from "./routes/admin.route.js"
 import { productRouter } from "./routes/product.route.js"
 import {userRouter} from "./routes/user.route.js"
-// import {reviewRouter} from "./routes/review.route.js"
+import { reviewRouter } from "./routes/review.route.js"
 import { connectDB } from "./db.config.js"
 import {serverMiddleware} from "./middleware/server.middleware.js"
 import { fileURLToPath } from "url"
@@ -32,7 +32,7 @@ app.use("/product", productRouter)
 // app.use("/order", orderRouter)
 // app.use("/orderHistory", orderHistoryRouter)
 // app.use("/payment", paymentRouter)
-// app.use("/review", reviewRouter)
+app.use("/review", reviewRouter)
 app.use("/download",downloadRouter)
 
 //undefined route/method and error handler
