@@ -115,14 +115,10 @@ const delOneUser = async(req,res,next) => {
 }
 
 const createAdmin = async(req,res,next) => {
-    //directly generating admin
-    const user = await Users.create({
-        name : "Abhishek Timsina",
-        password : "abhi123@@##**",
-        email : "timsinaabhishek1@gmail.com",
-        address : "Kalopul,Kathmandu",
-        role: "superadmin"
-    })
+    const userId = req.params.id
+    const user = await Users.findById(userId)
+    user.role = "admin"
+    await user.save()
     res.json(user)
 }
 

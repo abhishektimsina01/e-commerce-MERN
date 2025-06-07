@@ -4,43 +4,49 @@ import mongoose from "mongoose"
 const getAllproduct = async(req,res,next) => {
     try{
         if(req.user.role == "provider"){
-            const products = await Products.find({productOwner : req.user._id}).select("-productOwner -createdAt -updatedAt")
-            const product = await Products.aggregate([
-                {$match : {createdAt : {$lt : new Date(Date.now())}}},
-                {$lookup : {
-                    from : "reviews",
-                    localField : "_id",
-                    foreignField : "product",
-                    as : "reviews"
-                }},
-                // {$project : {
-                //     reviews : {
-                //         $map : {
-                //             input : "reviews",
-                //             as : "review",
-                //             in : {
-                                
-                //             }
-                //         }
-                //     }
-                // }}
+                console.log(req.user)
+                const product = await Products.aggregate([
+                {$match : {productOwner : new mongoose.Types.ObjectId(req.user._id)}},
+                {$project : {
+                    name : 1,
+                    price : 1,
+                    brand : 1,
+                    category : 1,
+                    productImage : 1,
+                }}
+
             ])
             res.json(product)
         }
-        else if(req.user.role == "admin" || req.user.role == "superadmin"){
+        else if(req.user.role == "admin" || req.user.role == "superadmin" || req.user.role == "consumer"){
             console.log(req.user.role)
-            const products = await Products.find().select("-createdAt -updatedAt ").populate("productOwner", "-_id -password -createdAt -updatedAt -role -address -refreshToken")
+            const products = await Products.find().select("-createdAt -updatedAt -brand -state -stock -productOwner")
             res.json(products)
         }
-        else{
+    }
+    catch(err){ 
+        next(err)
+    }
+}
 
-        }
+const getOneproduct = async(req,res,next) => {
+    try{
+        const productId = req.params.id
+        const product = await Products.aggregate([
+            {$match : {_id : new mongoose.Types.ObjectId(productId)}},
+            {$lookup : {
+                from : "reviews",
+                localField : "_id",
+                foreignField : "product",
+                as : "reviews"
+            }},
+        ])
+        res.json(product)
     }
     catch(err){
         next(err)
     }
 }
-
 const createProduct = async(req,res,next) => {
     try{
         //if the image of the product is uploaded then we can use the image as req.file.filename
@@ -60,7 +66,7 @@ const createProduct = async(req,res,next) => {
             category,
         })
         product.productOwner = req.user._id
-        if(!req.file.path == undefined){product.productImage = req.file.path}
+        product.productImage = "http://localhost:8000/env.jpg"
         await product.save()
         res.json(product)
     }
@@ -71,34 +77,29 @@ const createProduct = async(req,res,next) => {
 
 const deleteProduct = (req,res,next) => {
     try{
-
+        const userId = req.params.id
+        res.json(userId)
     }
     catch(err){
         next(err)
     }
 }
 
-// const deleteOneProduct = async(req,res,next) => {
-//     try{
-
-//     }
-//     catch(err){
-//         next(err)
-//     }
-// }
-
-const getOneProduct = (req,res,next) => {
+const deleteOneProduct = async(req,res,next) => {
     try{
-
+        const userId = req.params.id
+        res.json(userId)
     }
     catch(err){
         next(err)
     }
 }
+
 
 const updateProduct = (req,res,next) => {
     try{
-
+        const userId = req.params.id
+        res.json(userId)
     }
     catch(err){
         next(err)
@@ -106,4 +107,4 @@ const updateProduct = (req,res,next) => {
 }
 
 
-export {getAllproduct, createProduct, getOneProduct, deleteProduct, updateProduct}
+export {getAllproduct, getOneproduct, createProduct, deleteProduct, updateProduct}

@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
     refreshToken : String,
 }, {timestamps : true, versionKey : false})
 
-userSchema.methods.isPasswordRight = async(password) => {
+userSchema.methods.isPasswordRight = async function(password){
     return await bcrypt.compare(password, this.password)
 }
 
