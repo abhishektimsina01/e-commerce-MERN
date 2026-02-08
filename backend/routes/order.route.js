@@ -1,8 +1,10 @@
 import express from "express";
 import {createOrder, getAllOrders, cancelOrder, updateOrder} from "../controllers/"
+import {authenticateUser} from "../middleware/authenticateUser"
+import {authorizeUser} from "../middleware/authorizedRoute"
 const orderRouter = express.Router()
 
-orderRouter.post("/", createOrder)
+orderRouter.post("/",authenticateUser, authorizeUser("consumer"), createOrder)
 orderRouter.get("/", getAllOrders)
 orderRouter.delete("/:id", cancelOrder)
 orderRouter.update("/:id", updateOrder)

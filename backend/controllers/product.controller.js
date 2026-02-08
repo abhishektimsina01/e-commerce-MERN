@@ -14,7 +14,6 @@ const getAllproduct = async(req,res,next) => {
                     category : 1,
                     productImage : 1,
                 }}
-
             ])
             res.json(product)
         }

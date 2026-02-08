@@ -8,8 +8,7 @@ const userSchema = new mongoose.Schema({
     email : {type : String, required : true, unique : true},
     role : {type : String, enum : { values : ["superadmin","admin","provider", "consumer"], message : "not valid role"}},
     address : String,
-    isActive : Boolean,
-    refreshToken : String,
+    isActive : Boolean
 }, {timestamps : true, versionKey : false})
 
 userSchema.methods.isPasswordRight = async function(password){

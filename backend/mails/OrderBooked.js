@@ -8,3 +8,5 @@ const signupMail = () => {
     }
     sendMail(mailOptions)
 }
+
+export {signupMail}
