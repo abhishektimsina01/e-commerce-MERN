@@ -17,7 +17,7 @@ const serverMiddleware = (app, __dirname) => {
     app.use(limiter)
     console.log(__dirname)
     app.use(express.static(path.join( __dirname, "public")))
-    app.use(cors())
+    // app.use(cors())
     app.use(morgan("dev"))  
     app.use(express.json())
     app.use(express.urlencoded({extended : true}))

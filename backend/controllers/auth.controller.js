@@ -8,11 +8,13 @@ import {signupMail} from "../mails/SignupMail.js"
 const signup = async(req,res,next) =>{
     const allowedRoles = ["consumer", "provider"]
     try{
+        console.log("Signup")
         let {error} = userSignUpSchema.validate(req.body)
         if(error){
             error.status = 400
             throw error
         }
+        console.log(req.body)
         const {name, password, email, address} = req.body
         const isEmailExist = await Users.findOne({email})
         if(isEmailExist){

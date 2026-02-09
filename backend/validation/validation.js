@@ -25,7 +25,7 @@ const productSchema = Joi.object({
 })  
 
 const reviewSchema = Joi.object({
-    content : Joi.string().length(120),
+    content : Joi.string().min(5).max(120),
     star : Joi.number().positive().valid(0, 0.5 ,1 ,1.5 ,2 ,2.5 ,3 ,3.5 ,4 ,4.5 ,5).required()
 })
 
