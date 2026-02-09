@@ -39,6 +39,9 @@ const getOneproduct = async(req,res,next) => {
                 foreignField : "product",
                 as : "reviews"
             }},
+            {$project:
+                {}
+            }
         ])
         res.json(product)
     }
@@ -74,10 +77,9 @@ const createProduct = async(req,res,next) => {
     }
 }
 
-const deleteProduct = (req,res,next) => {
+const deleteProduct = async(req,res,next) => {
     try{
         const userId = req.params.id
-        Products.findByIdAndDelete(userId)
         res.json(userId)
     }
     catch(err){

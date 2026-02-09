@@ -34,7 +34,7 @@ const updateReview = async(req,res,next) => {
 }
 const deleteReview = async(req,res,next) => {
     try{
-        const id = req.params.id/
+        const id = req.params.id
         await Reviews.findByIdAndDelete(id)
         res.json({
             message : "deleted"
