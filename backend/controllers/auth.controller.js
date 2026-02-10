@@ -59,7 +59,6 @@ const login = async(req,res,next) =>{
             }
             const {email , password} = req.body
             const user = await Users.findOne({email})
-            console.log(user)
             if(!user){
                 const err = new Error("no user found")
                 err.status = 404

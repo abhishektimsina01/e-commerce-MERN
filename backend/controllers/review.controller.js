@@ -49,7 +49,7 @@ const getAllreview = async(req,res,next) => {
     try{
         if(req.user.role == "consumer"){
             const userId = req.params.id
-            const reviews = Reviews.aggregate([
+            const reviews = await Reviews.aggregate([
                 {$match : {user : new mongoose.Types.ObjectId(userId)}},    
                 {$lookup : {
                     from : "products",

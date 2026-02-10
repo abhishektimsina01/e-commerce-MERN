@@ -4,6 +4,7 @@ const authenticateUser = (req,res,next) => {
         const  {accessToken} = req.cookies
         const decoded_data = jwt.verify(accessToken, process.env.access_token)
         req.user = decoded_data
+        console.log(req.user)
         next()
     }
     catch(err){

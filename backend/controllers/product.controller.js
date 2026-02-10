@@ -39,9 +39,6 @@ const getOneproduct = async(req,res,next) => {
                 foreignField : "product",
                 as : "reviews"
             }},
-            {$project:
-                {}
-            }
         ])
         res.json(product)
     }
