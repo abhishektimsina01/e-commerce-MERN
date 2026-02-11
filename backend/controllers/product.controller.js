@@ -1,6 +1,9 @@
 import {productSchema} from "../validation/validation.js"
 import {Products} from "../models/product.js"
+import {Reviews} from "../models/reviews.js"
 import mongoose from "mongoose"
+import { Orders } from "../models/orders.js"
+import { outOfTheStock } from "../mails/OutOfStock.js"
 const getAllproduct = async(req,res,next) => {
     try{
         if(req.user.role == "provider"){
@@ -13,6 +16,7 @@ const getAllproduct = async(req,res,next) => {
                     brand : 1,
                     category : 1,
                     productImage : 1,
+                    productOwner : 1
                 }}
             ])
             res.json(product)
@@ -39,6 +43,40 @@ const getOneproduct = async(req,res,next) => {
                 foreignField : "product",
                 as : "reviews"
             }},
+            {$lookup : {
+                from : "users",
+                localField : "productOwner",
+                foreignField : "_id",
+                as : "owner"    
+            }},
+            {$unwind : "$owner"},
+            {$project : {
+                _id : 1,
+                name : 1,
+                stock : 1,
+                price : 1,
+                brand : 1,
+                category : 1,
+                productImage: 1,
+                reviews : {
+                    $map : {
+                        input : "$reviews",
+                        as : "review",
+                        in : {
+                            _id : "$$review._id",
+                            user : "$$review.user",
+                            product : "$$review.product",
+                            star : "$$review.star"
+                            }
+                        }
+                    },
+                owner : { 
+                    _id : "$owner._id",
+                    name : "$owner.name",
+                    is_active : "$owner.isActive"
+                    }
+                }
+            }
         ])
         res.json(product)
     }
@@ -53,7 +91,6 @@ const createProduct = async(req,res,next) => {
         if(error){
             throw error
         }
-
         const {name, description, stock, price, brand, state, category} = req.body
         const product = new Products({
             name,
@@ -74,20 +111,37 @@ const createProduct = async(req,res,next) => {
     }
 }
 
+
+// if i remove the product then i also need to remove all the reviews to the product and also check if there are any prodcut on order
 const deleteProduct = async(req,res,next) => {
     try{
-        const userId = req.params.id
-        res.json(userId)
-    }
-    catch(err){
-        next(err)
-    }
-}
+        const productId = req.params.id
+        const prodcut = await Products.findById(productId)
+        const reviewsForTheProduct = await Reviews.find({product : productId})
+        const ordersForTheProduct = await Orders.find({product : productId})
+        const reviewsObject = reviewsForTheProduct.map(review => {
+            return{
+                _id : review._id,
+                user : review.user,
+                product : review.product,
+                star : review.star
+            }
+        })
+        const processedObject = {
+            prodcut,
+            reviewsObject,
+            ordersForTheProduct
+        }
+        console.log(processedObject)
 
-const deleteOneProduct = async(req,res,next) => {
-    try{
-        const userId = req.params.id
-        res.json(userId)
+        // whe the user want to remove the specific product then we remove all the orders, revies and the product from our db
+        await Products.findByIdAndDelete(productId)
+        await Orders.deleteMany({product : productId})
+        await Reviews.deleteMany({product : productId})
+        outOfTheStock(prodcut.name)
+        res.json({
+            message : "product removed wit all the orders and the reviews to it"
+        })
     }
     catch(err){
         next(err)
@@ -97,8 +151,12 @@ const deleteOneProduct = async(req,res,next) => {
 
 const updateProduct = (req,res,next) => {
     try{
-        const userId = req.params.id
-        res.json(userId)
+        const productId = req.params.id
+        const product = Products.findById(productId)
+        const data = req.body
+        const new_Product = Object.assign(product, data)
+        console.log(new_Product)
+        res.json(productId)
     }
     catch(err){
         next(err)

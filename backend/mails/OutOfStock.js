@@ -1,9 +1,12 @@
+import express from "express"
 import {sendMail} from "../helpers/sendMail.js"
 
-const signupMail = () => {
+const outOfTheStock = (productName) => {
     const mailOptions = {
-        subject : "Welcome to ATO e-commerce",
-        html : ``,
+        subject : `${productName} was removed from the availability`,
+        // html : ``,
     }
     sendMail(mailOptions)
 }
+
+export {outOfTheStock}

@@ -6,7 +6,7 @@ import { upload } from "../middleware/multer.js"
 import { createProduct,getOneproduct, getAllproduct, updateProduct, deleteProduct} from "../controllers/product.controller.js"
 const productRouter = express.Router()
 
-productRouter.post("/", authenticateUser, authorizeUser("provider"),upload.single("fieldname"), createProduct)
+productRouter.post("/", authenticateUser, authorizeUser("provider"), createProduct)
 productRouter.get("/", authenticateUser, authorizeUser("consumer", "provider", "admin", "superadmin"), getAllproduct)
 productRouter.get("/:id", authenticateUser, authorizeUser("consumer", "provider", "admin", "superadmin"), getOneproduct)
 productRouter.patch("/:id", authenticateUser, authorizeUser("consumer", "superadmin"), updateProduct)

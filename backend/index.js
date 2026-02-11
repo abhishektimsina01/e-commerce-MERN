@@ -11,7 +11,8 @@ import {serverMiddleware} from "./middleware/server.middleware.js"
 import { fileURLToPath } from "url"
 import path from "path"
 import { downloadRouter } from "./routes/download.route.js"
-import { start } from "repl"
+import { Users } from "./models/user.js"
+import mongoose from "mongoose"
 dotenv.config()
 
 //express application
@@ -24,6 +25,18 @@ export const __dirname = path.dirname(__filename);
 serverMiddleware(app, __dirname)
 
 //routers
+app.delete("/deleteUsers", async(req, res, next)=>{
+    try{
+    await Users.deleteMany({_id : {$exists : true}})
+    const users = await Users.find({})
+    res.json({
+        message : users
+    })
+    }
+    catch(err){
+        next(err)
+    }
+})
 app.use("/api/v1/auth/", authRouter)
 app.use("/api/v1/admin", adminRouter)
 app.use("/api/v1/user", userRouter)
