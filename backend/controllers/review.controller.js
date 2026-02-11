@@ -21,18 +21,21 @@ const makeReview = async(req,res,next) => {
         next(err)
     }
 }
+
 const updateReview = async(req,res,next) => {
     try{
-        const id = req.params.id
-        const {content, star} = req.body
-        const review = await Reviews.findByIdAndUpdate(id, {
-            
-        })
+        const reviewId = req.params.id
+        const data = req.body
+        let review = await Reviews.findById(reviewId)
+        Object.assign(review, data)
+        review.save()
+        res.json(review)
     }
     catch(err){
         next(err)
     }
 }
+
 const deleteReview = async(req,res,next) => {
     try{
         const id = req.params.id

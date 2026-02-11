@@ -1,5 +1,4 @@
 import Joi from "joi";
-import { startSession, STATES } from "mongoose";
 
 const userLogInSchema = Joi.object({
     email : Joi.string().email().trim().required(),
@@ -29,4 +28,9 @@ const reviewSchema = Joi.object({
     star : Joi.number().positive().valid(0, 0.5 ,1 ,1.5 ,2 ,2.5 ,3 ,3.5 ,4 ,4.5 ,5).required()
 })
 
-export {userLogInSchema, userSignUpSchema, productSchema, reviewSchema}
+const orderSchema = Joi.object({
+    product : Joi.string().required(),
+    quantity : Joi.number().min(1).required(),
+})
+
+export {userLogInSchema, userSignUpSchema, productSchema, reviewSchema, orderSchema}

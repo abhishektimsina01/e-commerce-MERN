@@ -149,14 +149,14 @@ const deleteProduct = async(req,res,next) => {
 }
 
 
-const updateProduct = (req,res,next) => {
+const updateProduct = async(req,res,next) => {
     try{
         const productId = req.params.id
-        const product = Products.findById(productId)
-        const data = req.body
-        const new_Product = Object.assign(product, data)
-        console.log(new_Product)
-        res.json(productId)
+        console.log("---------------", req.body, "---------------")
+        let product = await Products.findById(productId)
+        Object.assign(product, req.body)
+        product.save()
+        res.json(product)
     }
     catch(err){
         next(err)

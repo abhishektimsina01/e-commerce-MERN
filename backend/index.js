@@ -13,6 +13,7 @@ import path from "path"
 import { downloadRouter } from "./routes/download.route.js"
 import { Users } from "./models/user.js"
 import mongoose from "mongoose"
+import { orderRouter } from "./routes/order.route.js"
 dotenv.config()
 
 //express application
@@ -41,10 +42,7 @@ app.use("/api/v1/auth/", authRouter)
 app.use("/api/v1/admin", adminRouter)
 app.use("/api/v1/user", userRouter)
 app.use("/api/v1/product", productRouter)
-// app.use("/cart", cartRouter)
-// app.use("/order", orderRouter)
-// app.use("/orderHistory", orderHistoryRouter)
-// app.use("/payment", paymentRouter)
+app.use("/api/v1/order", orderRouter)
 app.use("/api/v1/review", reviewRouter)
 app.use("/api/v1/download",downloadRouter)
 

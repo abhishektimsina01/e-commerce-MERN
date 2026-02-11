@@ -9,6 +9,6 @@ const productRouter = express.Router()
 productRouter.post("/", authenticateUser, authorizeUser("provider"), createProduct)
 productRouter.get("/", authenticateUser, authorizeUser("consumer", "provider", "admin", "superadmin"), getAllproduct)
 productRouter.get("/:id", authenticateUser, authorizeUser("consumer", "provider", "admin", "superadmin"), getOneproduct)
-productRouter.patch("/:id", authenticateUser, authorizeUser("consumer", "superadmin"), updateProduct)
+productRouter.patch("/:id", authenticateUser, authorizeUser("provider", "superadmin"), updateProduct)
 productRouter.delete("/:id", authenticateUser, authorizeUser("provider", "superadmin"), deleteProduct)
 export {productRouter}
