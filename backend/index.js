@@ -14,6 +14,7 @@ import { downloadRouter } from "./routes/download.route.js"
 import { Users } from "./models/user.js"
 import mongoose from "mongoose"
 import { orderRouter } from "./routes/order.route.js"
+import { Orders } from "./models/orders.js"
 dotenv.config()
 
 //express application
@@ -45,6 +46,12 @@ app.use("/api/v1/product", productRouter)
 app.use("/api/v1/order", orderRouter)
 app.use("/api/v1/review", reviewRouter)
 app.use("/api/v1/download",downloadRouter)
+
+app.get("/delete", async(req,res)=>{
+    await Orders.deleteMany({_id : {$exists : true}})
+    const orders = await Orders.find({})
+    res.json(orders)
+})
 
 //undefined route/method and error handler
 app.use(notFound)

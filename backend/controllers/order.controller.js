@@ -2,23 +2,40 @@ import mongoose from "mongoose"
 import { Orders } from "../models/orders.js"
 import { orderSchema } from "../validation/validation.js"
 import { Products } from "../models/product.js"
+import { outOfTheStock } from "../mails/OutOfStock.js"
 
 const createOrder = async(req,res,next) => {
     try{
             const {product, quantity} = req.body
-            const orderBy = req.user._id
+            const orderedBy = req.user._id
             const productInfo = await Products.findById(product)
-            console.log(productInfo)
+            console.log("before", productInfo)
+
+            if(productInfo.stock == 0){
+                const err = new Error("Out of the stock sorry")
+                // outOfTheStock(productInfo.name)
+                err.status = 404
+                throw err
+            }
+
+            else if(productInfo.stock - quantity < 0){
+                const err = new Error(`not enough stock, only ${productInfo.stock} left`)
+                throw err
+            }
+
+            const price = productInfo.price
+            const total = price * quantity
             const status = req.body?.status ?? "pending"
-            console.log({product, orderBy, quantity, status})
             const {error} = orderSchema.validate(req.body)
             if (error){
                 throw error
             }
-            const newOrder = new Orders({
-                product, quantity,status, orderBy
+            const newOrder = await Orders.create({
+                product, quantity, status, orderedBy, price, total
             })
-            newOrder.save()
+            productInfo.stock = productInfo.stock - 1
+            console.log("after", productInfo)
+            productInfo.save()
             res.json(newOrder)
     }
     catch(err){
@@ -31,13 +48,16 @@ const getAllOrders = async(req,res,next) => {
         // consumer le gareko sabai orders haru
         if(req.user.role == "consumer"){
             const customerId = req.user._id
-            const orders = await Orders.find({orderedBy : mongoose.Types.ObjectId(customerId)}).select("price", "quantity", "product", "total", "status").populate({path : "product", select : "name brand productOwner"})
+            console.log(customerId)
+            const orders = await Orders.find({orderedBy :  customerId}).select("price quantity product total status").populate({path : "product", select : "name brand productOwner"})
             res.json(orders)
         }
-
         // provider le payeko sabai orders haru
+        // orders jun chai usle haleko product ma aayeko xa
         else if(req.user.role == "provider"){
             const providerId = req.user._id
+            const productId = await Products.find({productOwner : providerId}).select("_id")
+            res.json(productId)
         }
     }
     catch(err){
