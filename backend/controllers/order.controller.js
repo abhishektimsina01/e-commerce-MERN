@@ -56,29 +56,47 @@ const getAllOrders = async(req,res,next) => {
         // orders jun chai usle haleko product ma aayeko xa
         else if(req.user.role == "provider"){
             const providerId = req.user._id
-            const productId = await Products.find({productOwner : providerId}).select("_id")
-            res.json(productId)
+            const products = await Products.find({productOwner : providerId}).select("_id")
+            const productIds = products.map((product)=> product._id)
+            console.log(productIds)
+            //now malai tyotyo orders chaiyo jasko product is in productIds
+            const orders = await Orders.find({product : {$in : productIds}}).select("orderedBy price quantity product total status").populate({path : "product", select : "name brand"})
+            res.json(orders)
         }
     }
     catch(err){
         next(err)
     }
 }
-const cancelOrder = (req,res,next) => {
-    try{
 
+const cancelOrder = async(req,res,next) => {
+    try{
+        const cancellorId = req.user._id
+        const toBeCancelledOrder = req.params.id
+        const order = await Orders.findById(toBeCancelledOrder)
+        order.status = "cancelled"
+        await order.save()
+        res.json(order)
     }
     catch(err){
         next(err)
     }
 }
-const updateOrder = (req,res,next) => {
+const updateOrder = async(req,res,next) => {
     try{
-
+        const customerId = req.user._id
+        const data = req.body
+        if(data.status == "cancelled"){
+            delete data.status
+        }
+        const orderId = req.params.id
+        const order = await Orders.findById(orderId)
+        Object.assign(order, data)
+        order.save()
+        res.json(order)
     }
     catch(err){
         next(err)
     }
 }
-
 export {createOrder,getAllOrders,cancelOrder,updateOrder}
