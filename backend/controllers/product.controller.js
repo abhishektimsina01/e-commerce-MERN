@@ -74,7 +74,7 @@ const getOneproduct = async(req,res,next) => {
                     _id : "$owner._id",
                     name : "$owner.name",
                     is_active : "$owner.isActive"
-                    }
+                    } 
                 }
             }
         ])

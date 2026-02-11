@@ -1,6 +1,7 @@
 import {reviewSchema} from "../validation/validation.js"
 import {Reviews} from "../models/reviews.js"
 import mongoose from "mongoose"
+import { Products } from "../models/product.js"
 
 const makeReview = async(req,res,next) => {
     try{
@@ -75,8 +76,37 @@ const getAllreview = async(req,res,next) => {
             res.json(reviews)
         }
         else if(req.user.role == "admin" || req.user.role == "superadmin"){
-            const reviews = await Reviews.find()
-            
+            const reviews = await Reviews.find()  
+        }
+
+        // if it was the provider then i have to send all his/her product's reviews with the respoective product
+        else if(req.user.role == "provider"){
+            const providerId = req.user._id
+            const product = await Products.find({productOwner : providerId})
+            console.log(product)
+            const productsId = product.map((prod)=>prod._id)
+            console.log("the product is", productsId)
+            console.log(productsId)
+            const reviews  = await Reviews.aggregate([
+                {$match : {product : {$in : productsId}}},
+                {$lookup : {
+                    from : "products",
+                    localField : "product",
+                    foreignField : "_id",
+                    as : "product"
+                }},
+                {$unwind : "$product"},
+                {$project : {
+                    _id : 1,
+                    user : 1,
+                    product : {
+                        _id : "$product._id",
+                        name : "$product.name",
+                    }
+                }}
+            ])
+            // const reviews = await Reviews.findById(productId)
+            res.json(reviews)  
         }
     }
     catch(err){

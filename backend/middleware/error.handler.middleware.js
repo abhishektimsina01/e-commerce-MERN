@@ -13,6 +13,7 @@ const notFound = (req,res,next) =>{
 const errorHandler = (err, req,res,next) =>{
     const message = err.message
     const status = err.status || 400
+    console.log(err)
     res.json({
         error : message,
         status,
